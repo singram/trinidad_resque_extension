@@ -54,11 +54,15 @@ module Trinidad
 
         def invoke_workers(task)
           t = Rake::Task[task]
-          t.application.options[:trace] = true
+          t.application.options.trace = true if @options[:trace]
           t.invoke
         rescue Errno::ECONNREFUSED
           puts "WARN: Cannot connect with Redis. Please restart the server when Redis is up again."
           @redis_econnref = true
+        rescue Exception => e
+          puts "Error: Cannot start workers"
+          puts e.to_s
+          puts e.backtrace
         end
 
         def stop_workers
